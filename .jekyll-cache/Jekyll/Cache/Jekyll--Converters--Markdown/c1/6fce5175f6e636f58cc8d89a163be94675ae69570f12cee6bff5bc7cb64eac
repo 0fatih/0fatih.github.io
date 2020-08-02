@@ -1,0 +1,57 @@
+I"�<p>Simple Mail Transfer Protocol (Basit Mail İletim Protokolü), bilgisayarlarımızın 25. portu üstünde çalışır. Sadece e-mail göndermek için kullanılabilir. E-mail almak için ise IMAP veya POP3 gibi protokoller kullanmamız gerekir.</p>
+
+<p>Bu protokolün içerisinde bazı komutlar vardır. Onlar ise şu şekilde:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>HELO - Sunucuyu selamlamak için kullanılır. IP adresi veya Domain adresi belirtir
+EHLO - Extended SMTP(ESMTP) destekleyen sunucular için HELO'ya alternatif olarak kullanılır.
+STARTTLS - Karşı taraftan 220 durum kodu ile TLS şifrelemesi altında konuşmaya başlanabilir.
+RCPT - Alıcı belirtmek için kullanılır.
+DATA - Veri göndermek için kullanılır.
+RSET - Geçerli e-posta işlemini iptal etmek için kullanılır.
+MAIL - Gönderenin mailini belirtmek için kullanılır.
+QUIT - Bağlantıyı sonlandırır.
+HELP - Yardım ekranını elde etmek için kullanılır.
+AUTH - İstemcinin kimliğini sunucuya onaylatmak için kullanılır.
+VRFY - E-mail veritabanında bir e-mailin olup olmadığını öğrenmek için kullanılır.
+</code></pre></div></div>
+
+<p>Protokol hakkında vereceğim bilgiler bu kadardı. Daha fazlasını öğrenmek isterseniz <a href="https://blog.mailtrap.io/smtp-commands-and-responses/">buradan</a> öğrenebilirsiniz.</p>
+
+<p>Şimdi, biraz daha güvenlik tarafından bakalım. VRFY(verify) isimli komutumuzun, e-maillerin varlığını doğruladığını belirtmiştim. Bunun sayesinde eğer şüphelendiğimiz bir mail varsa teyit edebilir, yoksa da brute force gibi yöntemler ile e-mailleri elde edebiliriz.</p>
+
+<p>Bunun için bir örnek vereyim. Öncelikle hedefimizin IP’si 192.100.0.5 ve 25. portu da açık olsun. Netcat veya Telnet benzeri araçlar ile karşı tarafa bağlanalım:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nc 192.100.0.05 25
+
+220 metasploitable.localdomain ESMTP Postfix (Ubuntu)
+</code></pre></div></div>
+
+<p>Bağlantı başarılı olursa yukarıdaki gibi karşı taraf bize kendisini tanıtacak. Daha sonrasında,</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>VRFY root
+252 2.0.0 root
+VRFY rooot
+550 5.1.1 &lt;rooot&gt;: Recipient address rejected: User unknown in local recipient table
+</code></pre></div></div>
+
+<p>şeklinde iki adet sorgulama yaptık. “root” adlı sorgumuz başarılı oldu ve “252 2.0.0 root” dönütünü aldık. Ancak, ikinci sorgumuz başarısız oldu. Çünkü sistemde kayıtlı “rooot” isimli bir mail bulunamadı.</p>
+
+<p>Bu şekilde e-mailleri sorgulayabiliriz. Ancak, sizinde farkedeceğiniz gibi genel taramalarda pek mantıklı bir yöntem değil. Buna çözüm olarak Metasploit’in “auxiliary/scanner/smtp/smtp_enum” modülü kullanılabilir.</p>
+
+<p>Ayrıca, pentestmonkey’in <a href="https://github.com/pentestmonkey/smtp-user-enum">smtp-user-enum</a> isimli aracını da kullanabilirsiniz.</p>
+
+<p>Bir başka yazıda görüşmek üzere…</p>
+
+<p><strong>Fatih Furkan Hatipoğlu</strong></p>
+
+<p> </p>
+
+<p>Bana bu kadar bilgi yetmez, daha fazlasını istiyorum diyenler için birkaç tavsiye kaynak:</p>
+
+<p><a href="http://null-byte.wonderhowto.com/how-to/hack-like-pro-extract-email-addresses-from-smtp-server-0160814/">Null-Byte -Hack Like Pro Extract E-mail Adresses From SMTP Server</a></p>
+
+<p><a href="http://www.dummies.com/how-to/content/smtp-hacks-and-how-to-guard-against-them.html">Dummies - SMTP Hacks and How to Guard Against Them</a></p>
+
+<p><a href="https://pentestlab.wordpress.com/2012/11/20/smtp-user-enumeration/">Pentestlab - SMTP User Enumeration</a>
+ </p>
+:ET

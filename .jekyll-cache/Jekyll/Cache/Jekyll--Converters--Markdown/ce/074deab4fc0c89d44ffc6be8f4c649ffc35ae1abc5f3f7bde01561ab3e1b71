@@ -1,0 +1,41 @@
+I"+<p>Herhangi bir web uygulamasında, kendinize ait bir profilde olduğunuzu düşünün. Bunu biraz daha somut bir hale dönüştürelim. Bulunduğunuz site ismi xyz, id de 1024 olsun. Bu durumda sitenin size vereceği URL:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  https://xyz.com/profil?userID=1024
+</code></pre></div></div>
+
+<p>şeklinde olsun (burda belirtmeliyim ki, çoğu sitede bundan daha karışık bir biçimde olur. Yani, id’nin URL’de bulunma ihtimali düşük). 1024 sayesinde sunucu, bizim profilimizi gönderdi. Peki, 1024’ü değiştirirsek ne olur? Eğer, site bu zaafiyete sahipse, yani, yeteri kadar filtreleme işlemi yapmadan isteğimizi işliyorsa, başka profillere erişebiliriz.</p>
+
+<p>Şunu söylemekte fayda var; burada profil kısmının private olduğunu düşünelim. Yani, herkes sadece kendine ait profil kısmını görüyor. Çünkü, bildiğiniz gibi Twitter gibi sosyal medyalarda da user id değiştirilerek, diğer kullanıcıların profiline ulaşabiliyoruz. Bu, o sosyal medya sitelerinin IDOR zaafiyeti barındırdığı anlamına gelmiyor.</p>
+
+<p>Örneğimize dönersek, farklı profillere erişebildiğimizi biliyoruz. Sadece bununla yetinemeyiz değil mi? Devamı olmalı. Mesela, kendi profilimizi silmek isteyelim. Silme ekranında şöyle bir URL beliriyor:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  https://xyz.com/deleteAccount?userID=1024
+</code></pre></div></div>
+
+<p>Burada, userID değiştirilerek farklı kullanıcıların hesaplarını silebiliriz. Ama, kullanıcıyı silmenin bize pek bir faydası olmaz. Hadi şifresini değiştirelim:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  https://xyz.com/changePassword?userID=1024
+</code></pre></div></div>
+
+<p>UserID’yi değiştirerek, istediğimiz kişinin şifresini değiştirebiliriz.</p>
+
+<p>Bu ID kısmının, her zaman URL’de bulunmayacağını söyledim. Diğer bulunduğu yerlere örnek vermek gerekirse; gönderdiğimiz HTTP isteklerini incelersek, “uid”, “id”, “pid” gibi ifadeler görebiliriz. Bu parametreleri kurcalayarak, zaafiyet testi yapılabilir.</p>
+
+<p>Son olarak buraya bir <a href="https://medium.com/@woj_ciech/explaining-idor-in-almost-real-life-scenario-in-bug-bounty-program-c214008f8378">örnek</a> bırakıyorum. İsteyen kişiler okuyabilir.</p>
+
+<p><strong>Fatih Furkan Hatipoğlu</strong></p>
+
+<p> </p>
+
+<p>Bana bu kadar bilgi yetmez, daha fazlasını istiyorum diyenler için birkaç tavsiye kaynak:</p>
+
+<p><a href="https://www.bugcrowd.com/blog/how-to-find-idor-insecure-direct-object-reference-vulnerabilities-for-large-bounty-rewards/">Bugcrowd - How-To: Find IDOR</a></p>
+
+<p><a href="https://www.geeksforgeeks.org/insecure-direct-object-reference-idor-vulnerability/">Geeksforgeeks - IDOR Vulnerability</a></p>
+
+<p><a href="https://gracefulsecurity.com/idor-insecure-direct-object-reference/">Gracefulsecurity - IDOR</a></p>
+
+<p><a href="https://codeburst.io/hunting-insecure-direct-object-reference-vulnerabilities-for-fun-and-profit-part-1-f338c6a52782">Codeburst - IDOR</a></p>
+
+<p><a href="https://blog.detectify.com/2016/05/25/owasp-top-10-insecure-direct-object-reference-4/">Detectify - IDOR</a></p>
+:ET

@@ -1,0 +1,2 @@
+I"<p>HTTP istek kaçakçılığı olarak Türkçe’ye çevirebileceğimiz HTTP Request Smuggling açığı, sunucuda kullanılan front-end ve back-end sistemlerinin senkronize bir şekilde çalışmamasından kaynaklanır. Günümüzde çoğu sunucu zincirleme bir sisteme sahip. Bu zincirleme sistemlerin birbiri ile optimize bir şekilde çalışması için özenle yapılandırmak gerek. Ancak her ne kadar dikkat edilmeye çalışılsa da bazen gözden kaçan noktalar olabiliyor. HTTP Request Smuggling de bu noktalardan birisi.</p>
+:ET

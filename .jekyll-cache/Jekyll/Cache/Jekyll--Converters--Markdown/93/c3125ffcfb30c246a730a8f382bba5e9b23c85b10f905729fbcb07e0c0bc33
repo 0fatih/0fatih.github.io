@@ -1,0 +1,2 @@
+I"�<p>CRLF, birçok protokolde kullanılan bir yöntemdir. Kullanılma amacı genellikle; bir satırı bitirip yeni satırın başladığını belirtmektir. Web Uygulamalarında ise, HTTP isteklerinde kullanılır. Bir isteğin header kısmı dediğimiz bölüm ile, HTML kodlarını ayırmada ve satır sonlarını belirtmekte kullanırız. Encode edilmiş hali “%0d%0a” iken, encode edilmemiş hali “\r\n” dir. CRLF’lerin kullanımına örnek bir istek şu şekilde olabilir:</p>
+:ET

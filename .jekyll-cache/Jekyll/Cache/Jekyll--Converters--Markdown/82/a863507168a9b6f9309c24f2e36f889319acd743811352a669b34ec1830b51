@@ -1,0 +1,56 @@
+I"�<p>Merhaba, bu yazıda sizlere elimden geldiğince TCP/IP protokol grubundan bahsedeceğim. Asıl konumuza geçmeden önce, bu konu ile ilgili birkaç bilgi vermem gerekiyor.</p>
+
+<ul>
+  <li>TCP/IP, Transmission Control Protocol/Internet Protocol’ün kısaltılmış halidir.</li>
+  <li>Protokol, bilişim sistemlerinde cihazlar arasındaki veri iletiminin nasıl olması gerektiğini belirten kurallar bütününe verilen isimdir. Programcılar tercihlerine göre birçok protokolü kullanabilir.</li>
+  <li>Protokol grubu, içerisinde bir sürü protokol barındıran yapıdır. Barındırdığı protokollerin birbirleri ile sistemli bir şekilde çalışabilmesi için yapılandırılmıştır.</li>
+</ul>
+
+<h2 id="tcpip-nedir">TCP/IP Nedir?</h2>
+
+<p>TCP/IP yukarıda da belirttiğim gibi bir protokol grubudur. İçerisinde onlarca protokol barındırır. Bu protokollerin birbiri ile düzenli şekilde çalışmasına olanak sağlar. Günümüzdeki sistemlerin birçoğu bu yapıyı kullanır. Yani, bizler de her gün bu nimetten faydalanıyoruz, ancak arka planda çalıştığı için farkında olmuyoruz.</p>
+
+<p>TCP/IP’nin daha kolay anlaşılması için katman modellemesi kullanılıyor. Modele göre dört katman vardır. Aslında katmanlar yok. Sadece, protokolleri gruplandırıp, kafamızda canlandırmamızı kolaylaştıran bir yapı. TCP/IP için de bir program diyebiliriz. Çünkü programlama dili ile yazılmış bir sistemdir.</p>
+
+<h2 id="neden-protokol-gruplarına-i̇htiyaç-duyuyoruz">Neden Protokol Gruplarına İhtiyaç Duyuyoruz?</h2>
+
+<p>TCP/IP ve TCP/IP çıkana kadar çok kullanılmış olan OSI(Open System Interconnection) gibi protokol gruplarına neden ihtiyacımız var? Birçok şey gibi bu gruplar da ihtiyaç sonucu ortaya çıkmıştır. Henüz ortada protokol grupları yokken, şirketler kendi protokollerini üretiyordu. Ancak burada bir sorun vardı. Farklı şirketlerin cihazları birbiri ile iletişim gerçekleştiremiyordu. Hatta, bazen aynı şirketin iki ürünü bile iletişim kuramıyordu. Çünkü farklı protokolleri kullanmaktaydılar. Şöyle düşünün, sadece ana dilini bilen bir Japon ve yine sadece ana dilini bilen bir Türk’ün iletişimi nasıl olurdu?</p>
+
+<p>Bu soruna çözüm olarak ilk önce OSI modeli geliştirilmiştir. Ancak çeşitli sebeplerden ötürü TCP/IP gibi bir yapıya gereksinim duyulmuş ve geliştirilmiştir. Temel olarak yaptıkları iş aynı diyebiliriz. Fakat, aralarındaki farkları da görmezden gelemeyiz.</p>
+
+<h2 id="tcpip-katmanları">TCP/IP Katmanları</h2>
+
+<p>TCP/IP, protokollerin birbirleri ile sistemli bir şekilde çalışması için kullanılır demiştim. Bu katmanları sırasıyla inceleyeceğiz. Sistemi aklınızda canlandırabilmeniz için aşağıdaki fotoğrafı inceleyebilirsiniz.</p>
+
+<p><img src="https://www.researchgate.net/profile/Isara_Anantavrasilp/publication/49288737/figure/fig3/AS:669528941940736@1536639547022/TCP-IP-reference-model-The-upper-diagram-shows-the-network-connection-view-of-a.png" alt="TCP/IP" /></p>
+
+<h3 id="uygulama-katmanı-4-katman">Uygulama Katmanı (4. Katman)</h3>
+
+<p>Bu katmanda veriyi göndermek isteyen uygulama ve kullandığı dosya biçimi bulunarak gönderilen verinin  türüne göre  farklı protokoller çalıştırılır (HTTP,  SMTP, FTP, Telnet, vs.) ve  programlarla Taşıma protokollerinin haberleşmesi sağlanır. Uygulama Katmanı Taşıma Katmanıyla portlar aracılığıyla haberleşir. Portlar numaralandırılmış standart uygulamalardır (HTTP:80, FTP:21, vs.) ve Taşıma Katmanında gelen paket içeriğinin türünün anlaşılmasında rol oynar.</p>
+
+<h3 id="taşıma-katmanı-3-katman">Taşıma Katmanı (3. Katman)</h3>
+
+<p>Bu katman verinin ne şekilde gönderildiğini gösterir. TCP  (Transmission Control Protocol) ve UDP (User Datagram Protocol) protokolleri bu katmanda çalışır. TCP ve UDP iletim esnasında veriye içinde bazı kontrol bilgilerinin bulunduğu bir başlık (header)  ekler. TCP, kayıpsız veri gönderimi sağlayabilmek için kullanılan protokoldür. Gönderilen veriler için özel bir TCP kabul paketi (TCP ACK) gönderilir ve gelmiş olan paketlerin doğruluğu kontrol edilir. Gönderen taraf, kabul gelmediği sürece pakedi tekrar gönderir, böylece gönderim sağlanmış olur. TCP’de veri iletimi için iki bilgisayar arasında Three-Way Handshake (Üç Zamanlı El Sıkışma) bağlantısı kurulur. HTTP, HTTPS, POP3, SMTP, FTP, SFTP gibi protokollerdeki veri iletimi TCP vasıtasıyla yapılır. UDP’de ise gönderilen paketin ulaşıp ulaşmadığı kontrol edilmez. Bağlantı kurulum işlemleri, veri akış kontrolü ve tekrar iletim işlemleri yapmayarak iletim süresini azaltır ve ağ üzerinde TCP’ye oranda daha az bant genişliği kaplar. TFTP, SNMP gibi protokoller UDP vasıtasıyla çalışır.</p>
+
+<h3 id="internet-katmanı-2-katman">Internet Katmanı (2. Katman)</h3>
+
+<p>Bu katmanda hedef veya kaynak IP adresleri veriye eklenerek verinin hangi bilgisayara gönderileceği belirlenir ve gönderilen paket Veri Bloğu (Datagram) halini alır. Datagram maksimum 65,535 bayt boyutunda olabilir, daha fazla boyutlardaki paketleri IP protokolü yeteri kadar “Datagram”a ayırır. IP, ICMP, IGMP, ARP gibi protokoller bu katmanda çalışır.</p>
+
+<h3 id="ağ-katmanı-1-katman">Ağ Katmanı (1. Katman)</h3>
+
+<p>Bu katmanda verinin kablo üzerinde alacağı yapıyı tanımlayarak bir ve sıfırların fiziksel olarak görüntülenmesi sağlanır. Ethernet Ağ Arayüzü Katmanında kullanılan ve veri iletiminin fiziksel görünümünü sağlayan en yaygın kablolu yerel ağ teknolojisidir. Ethernet üç alt katmana sahiptir; LLC (Logic Link Control Layer- Mantıksal Bağlantı Kontrolü), MAC (Media Access Control-Ortam Erişim Kontrolü) ve Pyhsical(Fiziksel). LLC alt katmanında, İnternet Katmanı’ndaki frame(çerçeve)’in hangi protokolle geldiğini belirleyerek iletimin  MAC’a geçişini sağlar. MAC alt katmanında, hedef ve kaynak mac adresleri eklenir. LLC ve MAC, veri bloğuna kendi başlıklarını ekleyerek tam “frame” yapısını oluştururlar. Fiziksel alt katman ise bu “frame”i elektrik sinyaline(kablolu ağda) ya da elektromanyetik dalgalara(kablosuz ağda) dönüştürür.</p>
+
+<p><strong>Fatih Furkan Hatipoğlu</strong></p>
+
+<p> </p>
+
+<p>Bana bu kadar bilgi yetmez, daha fazlasını istiyorum diyenler için birkaç tavsiye kaynak:</p>
+
+<p><a href="https://bidb.itu.edu.tr/seyir-defteri/blog/2013/09/07/tcp-ip-protokolu">ITU - TCP/IP</a></p>
+
+<p><a href="https://searchnetworking.techtarget.com/definition/TCP-IP">TechTarget - TCP/IP</a></p>
+
+<p><a href="https://www.cloudflare.com/learning/ddos/glossary/tcp-ip/">CloudFlare - TCP/IP</a></p>
+
+<p><a href="https://www.geeksforgeeks.org/tcp-ip-model/">GeeksForGeeks - TCP/IP Model</a></p>
+:ET

@@ -1,0 +1,61 @@
+I"�<p>Merhaba, sizlere bu yazıda açıklayacağım konunun ismi; Web Önbellek Zehirlemesi. Asıl konumuza gelmeden önce bazı temel bilgiler vermeliyim.</p>
+
+<h2 id="cache-memory-önbellek-nedir">Cache Memory (Önbellek) Nedir?</h2>
+
+<p>Her ne kadar birçok çeşidi olsa da (bilgisayar önbelliği, sunucu önbelleği, veritabanı önbelleği vs.), hepsinin amacı aynıdır; bizlere daha hızlı hizmet vermek. Önbelleklerin boyutları, diğer belleklere göre çok daha küçüktür. Çünkü, diğer belleklerden kat kat daha hızlı işlem yaparlar. Örneğin, kişisel bilgisayarlarımızdaki önbelleklerin boyutları MegaByte’larla ölçülür.</p>
+
+<p>Web önbellekleri ise, bizlere hedef sitemizi getirmeye yardımcı olan, <a href="https://www.cloudflare.com/learning/cdn/what-is-a-cdn/">CDN</a> gibi serverların önbellekleridir. Eğer, girmek istediğiniz bir web sunucusu size çok uzak ise, CDN’ler burada devreye girer. Dünya’da birçok yerde bulunan CDN’ler, belirli aralıklarla sizin ulaşmak istediğiniz web sitesini önbelleğine kaydeder (tabii o web sitesinin herhangi bir CDN sunucu hizmeti alıyorsa). Bunun amacı, tekrar tekrar web sitesi sunucusuna kadar gitmemize engel olmaktır.</p>
+
+<p><img src="https://www.cloudflare.com/img/learning/cdn/what-is-a-cdn/what-is-a-cdn.png" alt="CDN" /></p>
+
+<p>Siz bir siteye girmek isteğinizi gönderdiniz. Ama CDN sunuucusu, sizin istediğiniz siteyi önbelleğine almamış. Bu durumda, CDN web sunucusuna başvururak siteyi bize getirir. Ve bir sonraki istekte daha hızlı davranabilmek için, bu siteyi kendi önbelleğine kaydeder. Bunun sonucunda, bizden sonra herhangi birisi o siteye istek atarsa, çok daha hızlı bir şekilde ulaşması olasıdır.</p>
+
+<h2 id="web-önbellekleri-nasıl-çalışır">Web Önbellekleri Nasıl Çalışır?</h2>
+
+<p>Sunucu, kendisine gelen bir isteğin, önbelleğinde bulunup bulunmadığını nasıl anlar? Belki aklınıza, byte-byte karşılaştırmak gelmiş olabilir. Ancak, aynı siteye ulaşmak için, farklı iki bilgisayardan gönderilen HTTP istekleri, temel birkaç şeyin aynı olması ile dışında, muhtemelen farklı olacaktır. Örneğin, <a href="https://www.howtogeek.com/114937/htg-explains-whats-a-browser-user-agent/">User-Agent</a> başlığı gibi. Bu sorunu aşmak için, anahtarlama sistemi ortaya çıkarılmıştır. Gelen istekte, birkaç adet başlığın, önbellekte bulunan isteğin başlıkları ile uyuşması durumunda, sunucu önbellekteki siteyi, istek yapan kişiye gönderecektir. Mesela şöyle bir istek olsun;</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    GET /#blog HTTP/1.1
+    Host: fatihfurkan.site
+    User-Agent: Mozilla/5.0 … Firefox/57.0
+    Accept-Language: tr
+    Connection: close
+</code></pre></div></div>
+
+<p>Sunucu yapılandırmasına göre sadece, host başlığı ve istenilen dizin (/#blog) anahtarlandırılmış olsun. Bu durumda, sunucu iki anahtarı birbiri ile uyuşan isteklere, önbelleğindeki yanıtı döndürecektir. İşte sorun burada başlıyor. Peki ya anahtarlanmamış başlıklar ne olacak? Mesela, dili (language) değiştirerek bir istek atalım.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    GET /#blog HTTP/1.1
+    Host: fatihfurkan.site
+    User-Agent: Mozilla/5.0 … Firefox/57.0
+    Accept-Language: tr
+    Connection: close
+</code></pre></div></div>
+
+<p>Sunucu, yaptığı anahtar eşleştirmesinin pozitif sonuç üretmesinden ötürü, bize önceki isteğimize gönderdiği yanıtı döndürecektir. Ama biz parametre değiştirdik. Neden aynı yanıt geldi? Çünkü, sunucu dil parametresini algılamak için yapılandırılmadı. İşte Web Cache Poisoning açığının ortaya çıktığı kısım burası. Ayrıca şunu da belirtmeliyim ki, cache poisoning işlemi sadece aşağıda anlattığım şekilde değil, <a href="https://fatihfurkan.site/2020/HTTP-Request-Smuggling/">HTTP Request Smuggling</a> ve <a href="https://fatihfurkan.site/2020/HTTP-Response-Splitting/">HTTP Response Splitting</a> ile de yapılabilir.</p>
+
+<h2 id="web-önbellek-zehirlemesi">Web Önbellek Zehirlemesi</h2>
+
+<p>Şimdi, dil parametresi anahtarlanmamış. Bu yüzden sunucu, dil parametresini önemsemeden, diğer anahtarların uyuşması halinde, önbelleğindeki yanıtı gönderecektir. Peki, biz aşağıdaki gibi bir isteği, sunucu önbelleğine yerleştirebilirsek ne olur?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    GET /#blog HTTP/1.1
+    Host: fatihfurkan.site
+    User-Agent: Mozilla/5.0 … Firefox/57.0
+    Accept-Language: &lt;script&gt;alert(document.domain)&lt;/script&gt;
+    Connection: close
+</code></pre></div></div>
+
+<p>Eğer sunucuya giden bir isteğin anahtarları, bizim isteğimizdeki anahtarlarla aynı ise; sunucu, önbelleğine yerleştirdiğimiz yanıtı döndürecektir. Dönen yanıtın içerisinde, istekte gönderdiğimiz dil parametresi de olacağı için, yazdığımız script, istek sahibinin bilgisayarında çalışacaktır.</p>
+
+<p>İsteğimizi, sunucu önbelliğine nasıl yerleştireceğiz? Önbellekere alınan isteklerin sona erme süresi vardır. Bu süre bittikten sonra, sunucu önbelleğindeki isteği tazelemek için, kendisine gelen ilk istek için web sunucusuna başvuracaktır. Bizim amacımız ise, çok fazla istek atarak veya o süre bitimini yakalayarak isteğimizi, önbelleğe düşürmektir.</p>
+
+<p>Tabii, burdan sonrası sizin hayagücünüze kalmış.</p>
+
+<p><strong>Fatih Furkan Hatipoğlu</strong></p>
+
+<p> </p>
+
+<p>Bana bu kadar bilgi yetmez, daha fazlasını istiyorum diyenler için birkaç tavsiye kaynak:</p>
+
+<p><a href="https://portswigger.net/research/practical-web-cache-poisoning"> PortSwigger - Pratical Web Cache Poisoning (Araştırma)</a></p>
+
+<p><a href="https://portswigger.net/web-security/web-cache-poisoning"> PortSwigger - Web Cache Poisoning </a></p>
+:ET

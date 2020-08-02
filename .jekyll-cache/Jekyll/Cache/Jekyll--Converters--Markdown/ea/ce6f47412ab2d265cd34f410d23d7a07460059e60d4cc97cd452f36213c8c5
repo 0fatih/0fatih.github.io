@@ -1,0 +1,79 @@
+I":<p>Merhaba, bu yazıda 2FA Bypass’dan bahsedeceğim. Ancak önce 2FA’in ne olduğunu açıklığa kavuşturalım.</p>
+
+<h2 id="2fa-two-factor-authentication-nedir">2FA (Two-Factor Authentication) Nedir?</h2>
+
+<p>Herhangi bir siteye kullanıcı adı ve parolanız ile giriş yaptıktan sonra, bu bilgilere ek olarak başka bir güvenlik önmeliminin alınmasıdır. Mesela, Google hesabınıza giriş yapmak için kullanıcı adı ve parolanızı girdiniz ve Google telefonunuza güvenlik kodu gönderdi. Telefonunuza gelen kodu, giriş ekranına yazmadan hesaba erişemezsiniz. İşte bunun gibi önlemlere Two-Factor Authentication deniyor. Genel olarak şu kategorilerden oluşurlar.</p>
+
+<ul>
+  <li>Bildiğiniz bir şey: Anne kızlık soyadı, ilk öğretmeninizin adı gibi.</li>
+  <li>Sahip olduğunuz bir şey: Telefonunuz, kredi kartı veya herhangi bir donanım aracı.</li>
+  <li>Sizden bir şey: Parmaz izi, iris taraması vs.</li>
+</ul>
+
+<h2 id="2fa-bypass-nedir">2FA Bypass Nedir?</h2>
+
+<p>Yukarıda anlattığım gibi, 2FA bizlere fazladan güvenlik sağlar. Ama gelin görün ki teknolojide her zaman olduğu gibi tamamen güvenilir bir şey değildir. Atlatılabilir. Bypass kelimesi de siber alanda bu anlamda kullanılıyor. Herhangi bir güvenlik önlemini atlatmak, bypass etmektir. 2FA için birçok bypass metodu vardır. Hadi inceleyelim.</p>
+
+<h2 id="2fa-bypass-türleri">2FA Bypass Türleri</h2>
+
+<p><strong>Direkt Bypass</strong>: 2FA ile hiç uğraşmadan direkt olarak endpointe yönelmeye verilen isimdir. Kullanıcı adı ve parola ile X sitesine giriş yaptınız ve site telefonunuza sms göndererek sizden güvenlik kodunu istedi. Siz güvenlik kodunu girme ekranında iken URL’nin
+“x.com/2FA” olduğunu varsayalım. URL’in sonundaki 2FA’i silerek x.com’a giriş yapmayı deniyoruz.</p>
+
+<p><strong>Paylaşımlı Tokenler İle Bypass</strong>: Bu senaryoda, kendi hesabınıza giriş yapıyoruz. 2FA girişinde doğru kodu göndererek, sunucudan gelen HTTP yanıtını yakalıyoruz. Eğer yanıtın içerisinde 2FA için belirlenmiş bir token varsa, o tokeni kopyalıyoruz. Hedef hesabın kullanıcı adı ve parolasını girdikten sonra, endpointe bir istek atıyoruz. Ancak bu isteğin içerisine, daha önceden kopyalamış olduğumuz tokeni de ekliyoruz.</p>
+
+<p><strong>Parola Sıfırlama Linki İle Bypass</strong>: Çoğu web uygulaması parola sıfırladıktan sonra hesaba direkt olarak giriş yapar. Siteye girdiniz ve parolamı unuttum dediniz. Sistem, kullanıcının kayıtlı olan e-mail ya da telefon numarasına link göndererek parola sıfırlama işlemini gerçekleştiriyordur. Eğer sistem, her seferinde yeni bir link belirlememe gibi bir hata yapıyorsa, o linki kullanarak hesaba her zaman erişim sağlayabiliriz. Kullanıcı e-mailini değiştirse bile.</p>
+
+<p><strong>Oauth İle Bypass</strong>: x.com sitesinde facebook ile giriş yapma seçeneğinin bulunduğunu düşünelim. Eğer oradan giriş yapmayı seçersek, 2FA onaylamasına ihtiyacımız kalmayacaktır. Ancak bu yöntem pek uygulanamaz. Çünkü çoğu şirket bu tür girişleri kabul etmez.</p>
+
+<p><strong>Brute Force İle Bypass</strong>: 6 karakterlik bir kod için brute force yapmak günümüz sistemlerine çocuk oyuncağı gibi gelir. Ama, burada dikkat etmemiz gerek şey; hedef sistemin brute force saldırıları için aldığı önlemlerdir. Unutmadan söyleyeyim, “gizli” radarlara dikkat etmeniz gerekir. Mesela sistem, 50 istekten sonra sizin isteklerinizin hepsine olumsuz yanıtı döndürebilir. Brute force tiplerine bakacak olursak:</p>
+
+<ol>
+  <li>
+    <p><strong>Hız Limiti</strong>: Deneyebileceğiniz kod sayısı sınırsızdır. Ancak, istek yapma hızınız sınırlıdır. Örneğin, iki saniyede bir istek
+ yapmanıza izin veriliyordur.</p>
+  </li>
+  <li>
+    <p><strong>Deneme Limiti</strong>: Belirli sayıda kod denemenize izin verir. Fakat, bu sayılar genellikle çok küçüktür.</p>
+  </li>
+  <li>
+    <p><strong>Kodu Yeniden Gönder</strong>: Sanırım böylesi sistemler çok nadirdir. Sistem size bir kod gönderir, deneme hakkınızı bitirirsiniz, tekrar kod gönder dediğinizde sistem size aynı kodu gönderir fakat deneme hakkınızı sıfırlar.</p>
+  </li>
+  <li>
+    <p><strong>Benzer Endpointlere Giriş Yapmaya Çalışmak</strong>: Örneğin, x.com/login’e girmek istiyorsanız; x.com/Login , x.com/log-in , x.com/Log-in gibi denemeler yapmanızda fayda var.</p>
+  </li>
+  <li>
+    <p><strong>IP Başına Deneme Sınırlaması</strong>: Eğer sistem, her IP için belirli sayıda deneme yapmaya izin veriyorsa, o sayıyı bir IP için kullandıktan sonra, istek başlığımızdaki IP’yi değiştirmeliyiz. Bu IP’ler şu başlıklarda olabilir:</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> X-Originating-IP: 127.0.0.1
+ X-Forwarded-For: 127.0.0.1
+ X-Remote-IP: 127.0.0.1
+ X-Remote-Addr: 127.0.0.1
+
+ #veya double X-Forwared-For kullanabiliriz.
+ X-Forwarded-For:
+ X-Forwarded-For: 127.0.0.1
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>Diğer Tanımlayıcılar</strong>: Sizi tanımlayan diğer başlıkları da değiştirerek denemeler yapabilirsiniz. Örneğin; User-Agent, Cookie vs.</p>
+  </li>
+</ol>
+
+<p>Son olarak buraya olayı özetleyen bir fotoğraf bırakıyorum.</p>
+
+<p><img src="/../img/web-app/2FA-Bypass.jpeg" alt="Alt" /></p>
+
+<p>Bu yazılık benden bu kadar. Sağlıcakla kalın…</p>
+
+<p><strong>Fatih Furkan Hatipoğlu</strong></p>
+
+<p> </p>
+
+<p>Bana bu kadar bilgi yetmez, daha fazlasını istiyorum diyenler için birkaç tavsiye kaynak:</p>
+
+<p><a href="https://book.hacktricks.xyz/pentesting-web/2fa-bypass">Hacktricks - 2FA Bypass</a></p>
+
+<p><a href="https://www.youtube.com/watch?v=QJL63_LO6c8">RSA Conferences - 12 Ways to Hack 2FA (Video)</a></p>
+
+<p><a href="https://hackerone.com/reports/121696">HackerOne’dan Bir Örnek</a></p>
+:ET
