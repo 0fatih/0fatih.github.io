@@ -1,0 +1,4 @@
+This is a Brave Rewards publisher verification file.
+
+Domain: fatihfurkan.site
+Token: 867a18a255b315bc4e1e636be121929c0ba489216d17d4638dc95fba9184fdea
